@@ -1,5 +1,8 @@
-import { loadEnvConfig } from "@next/env";
-import { v2 as cloudinary } from "cloudinary";
+import nextEnv from "@next/env";
+import cloudinaryPackage from "cloudinary";
+
+const { loadEnvConfig } = nextEnv;
+const { v2: cloudinary } = cloudinaryPackage;
 
 loadEnvConfig(process.cwd());
 
