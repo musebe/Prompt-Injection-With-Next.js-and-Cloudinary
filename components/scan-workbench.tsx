@@ -143,7 +143,7 @@ export function ScanWorkbench() {
             {busyAction === "scan" && (
               <Progress value={58} aria-label="Scanning image">
                 <ProgressLabel>Quarantining and inspecting</ProgressLabel>
-                <ProgressValue>OCR + moderation</ProgressValue>
+                <ProgressValue>{() => "OCR + moderation"}</ProgressValue>
               </Progress>
             )}
 
