@@ -1,5 +1,83 @@
 # Editorial handoff: image prompt injection with Next.js and Cloudinary
 
+## Article brief
+
+**Title:** How to Protect Multimodal AI Agents From Image Prompt Injection With Next.js and Cloudinary
+
+**Deadline:** Sunday, August 16, 2026. This deadline had passed by the verified article date, August 22, 2026, so editorial should confirm the revised publication schedule.
+
+**Category:** AI Security
+
+**Opportunity score:** 10/10. Image prompt injection is an emerging, high-consequence problem with strong implementation intent, and the demo contributes a verifiable Cloudinary-specific defense rather than a conceptual summary.
+
+**Buildability score:** 8/10. Cloudinary provides the required upload, OCR, moderation, metadata, and signed-delivery primitives, while realistic adversarial coverage and human review still require application policy and production hardening.
+
+### Article objective
+
+Build a defensive image-ingestion layer that prevents suspicious image instructions from reaching a multimodal AI agent.
+
+### Technical stack
+
+Next.js, Cloudinary Advanced OCR, Amazon Rekognition moderation, Cloudinary structured metadata, authenticated assets, signed delivery URLs, TypeScript, React, shadcn, and Vitest.
+
+### Primary SEO focus
+
+Image prompt injection, multimodal AI security, secure AI image uploads, and vision model prompt injection.
+
+### Question the article should answer
+
+Can hidden instructions inside an image manipulate an AI agent?
+
+### Proof / GEO asset
+
+An attack matrix comparing direct text injection, visible image instructions, metadata payloads, and benign images. The matrix distinguishes unit-tested policy behavior from the disposable live Cloudinary verification.
+
+### Article outline
+
+1. Introduction
+2. How image prompt injection works
+3. Threat model
+4. Architecture overview
+5. Creating a private quarantine area
+6. Uploading images securely
+7. Extracting text with Cloudinary OCR
+8. Checking extracted instructions
+9. Running moderation and policy checks
+10. Storing security decisions as structured metadata
+11. Adding human approval for suspicious images
+12. Serving approved images with signed URLs
+13. Building the attack matrix
+14. Security limits and defense-in-depth
+15. Conclusion
+
+### Research and notes
+
+- [OWASP LLM01 prompt injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) establishes that malicious instructions embedded in multimodal inputs can alter model behavior and may enable unauthorized actions or disclosure.
+- [Self-interpreting Adversarial Images, USENIX Security 2025](https://www.usenix.org/conference/usenixsecurity25/presentation/zhang-tingwei) shows that visually natural images can contain cross-modal meta-instructions, so OCR must be described as a layer rather than a complete defense.
+- [Cloudinary Advanced OCR](https://cloudinary.com/documentation/ocr_text_detection_and_extraction_addon) returns extracted text under `info.ocr.adv_ocr` and documents a 1024 by 768 minimum image resolution.
+- [Amazon Rekognition AI Moderation](https://cloudinary.com/documentation/aws_rekognition_ai_moderation_addon) uses the `aws_rek` upload parameter and can return approved, rejected, or pending moderation state.
+- [Cloudinary structured metadata](https://cloudinary.com/documentation/structured_metadata) provides the persisted, typed asset record used for policy decisions and readback.
+- [Cloudinary media access control](https://cloudinary.com/documentation/control_access_to_media) documents authenticated assets and signed delivery. A signed URL remains shareable and is not an expiring authorization mechanism by itself.
+- Existing Cloudinary Blog coverage explains signed Next.js uploads and user-generated content moderation separately. This article's content gap is the combined quarantine-before-agent boundary with OCR, metadata inspection, moderation, decision persistence, readback, and signed release.
+
+### Code and implementation notes
+
+- Repository: [Prompt Injection With Next.js and Cloudinary](https://github.com/musebe/Prompt-Injection-With-Next.js-and-Cloudinary)
+- Live demo: [Agent Shield Lab](https://prompt-injection-with-next-js-and-c.vercel.app/)
+- Cloudinary engine: [`lib/cloudinary/security-assets.ts`](https://github.com/musebe/Prompt-Injection-With-Next.js-and-Cloudinary/blob/main/lib/cloudinary/security-assets.ts)
+- Policy engine: [`lib/security/policy.ts`](https://github.com/musebe/Prompt-Injection-With-Next.js-and-Cloudinary/blob/main/lib/security/policy.ts)
+- Upload orchestration: [`app/api/scans/route.ts`](https://github.com/musebe/Prompt-Injection-With-Next.js-and-Cloudinary/blob/main/app/api/scans/route.ts)
+- Agent release gate: [`app/api/scans/[scanId]/agent/route.ts`](https://github.com/musebe/Prompt-Injection-With-Next.js-and-Cloudinary/blob/main/app/api/scans/%5BscanId%5D/agent/route.ts)
+- Metadata provisioning: [`scripts/setup-cloudinary.mjs`](https://github.com/musebe/Prompt-Injection-With-Next.js-and-Cloudinary/blob/main/scripts/setup-cloudinary.mjs)
+- Verified checks: ESLint, TypeScript, nine Vitest tests, Next.js production build, and a disposable benign image that passed live Cloudinary OCR, moderation, persisted readback, and signed agent release.
+- Key limitation: the demo does not invoke a vision model or detect every steganographic, adversarial, or model-specific image attack. It proves and tests the defensive ingestion boundary before model invocation.
+
+### Keyword and metadata table
+
+| Primary keyword | Secondary keywords | Long-tail keywords | Meta title | Meta description |
+| --- | --- | --- | --- | --- |
+| image prompt injection | multimodal AI security; secure AI image uploads; vision model prompt injection; Cloudinary OCR security | how to prevent image prompt injection in Next.js; protect multimodal AI agents from malicious images; build a secure AI image-upload pipeline with Cloudinary; detect image instructions before vision-model delivery | Protect AI Agents From Image Prompt Injection | Build a fail-closed Next.js and Cloudinary pipeline that quarantines uploads, extracts image text, persists security decisions, and gates multimodal AI agents. |
+
 ## Search and editorial brief
 
 **Reader and problem:** A JavaScript or Next.js developer is adding image input to a multimodal agent and needs a practical security boundary before model invocation.
@@ -96,6 +174,7 @@ Do not add FAQ structured data solely because the article contains frequently as
 
 ## Publication blockers and final checks
 
+- Confirm a revised publication date because the supplied August 16, 2026 deadline has passed.
 - Rotate the Cloudinary API secret and demo-session secret exposed during development, update local and Vercel values, then redeploy.
 - Capture and sanitize the requested Cloudinary Console and workbench screenshots.
 - Confirm the final Cloudinary Blog canonical URL, publication date, modification date, and representative-image URLs.
