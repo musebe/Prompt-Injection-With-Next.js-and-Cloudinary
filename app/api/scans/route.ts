@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCloudinaryReadiness } from "@/lib/cloudinary/config";
+import { safeErrorContext, toSafeScanError } from "@/lib/cloudinary/errors";
 import {
   assetToScanRecord,
   deleteQuarantinedImage,
@@ -17,9 +18,9 @@ export const runtime = "nodejs";
 
 const MAX_PIXELS = 40_000_000;
 
-function errorResponse(error: unknown, status = 500) {
+function errorResponse(error: unknown, status = 500, code = "scan_failed") {
   const message = error instanceof Error ? error.message : "The image could not be scanned.";
-  return NextResponse.json({ error: message }, { status, headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ error: message, code }, { status, headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -72,6 +73,10 @@ export async function POST(request: Request) {
     }
     const message = error instanceof Error ? error.message : "";
     const clientError = /limit|JPEG|PNG|WebP|file type|image file|non-empty/i.test(message);
-    return errorResponse(error, clientError ? 422 : 500);
+    if (clientError) return errorResponse(error, 422, "invalid_image");
+
+    const safeError = toSafeScanError(error);
+    console.error("[image-scan] Cloudinary pipeline error", safeErrorContext(error));
+    return errorResponse(new Error(safeError.message), safeError.status, safeError.code);
   }
 }
